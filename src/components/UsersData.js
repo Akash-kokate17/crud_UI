@@ -7,7 +7,7 @@ import EditUser from "./EditUser";
 
 export function UsersData(props) {
   const [users, setUsers] = useState([]);
-  const [id, setId] = useState(2);
+  const [id, setId] = useState(null);
   const [flag, setFlag] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
 
@@ -34,7 +34,8 @@ export function UsersData(props) {
   };
 
   const addNewData = async (newData) => {
-    const newUser = { ...newData, id };
+    const newId = users.length ? users[users.length - 1].id + 1 : 1; 
+    const newUser = { ...newData, id: newId };
     try {
       if (
         newData.name !== "" &&
@@ -43,7 +44,6 @@ export function UsersData(props) {
         newData.gender !== ""
       ) {
         await axios.post(`http://localhost:5000/post`, newUser);
-        setId(id + 1);
         setUsers([...users, newUser]);
       } else {
         Swal.fire("All Fields Are Required!");
