@@ -7,7 +7,7 @@ import EditUser from "./EditUser";
 
 export function UsersData(props) {
   const [users, setUsers] = useState([]);
-  const [id, setId] = useState(2);
+  const [id, setId] = useState(null);
   const [flag, setFlag] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
 
@@ -43,7 +43,8 @@ export function UsersData(props) {
         newData.gender !== ""
       ) {
         await axios.post(`http://localhost:5000/post`, newUser);
-        setId(id + 1);
+        let calculateId = users.length;
+        setId(calculateId);
         setUsers([...users, newUser]);
       } else {
         Swal.fire("All Fields Are Required!");
@@ -61,11 +62,11 @@ export function UsersData(props) {
   const addUserActive = () => {
     setFlag(true);
   };
-  
+
   const editUserName = async (updatedUser) => {
     try {
       console.log(updatedUser, "updated user");
-  
+
       // Update the users array
       let changeUser = users.map((user) => {
         if (updatedUser.id === user.id) {
@@ -73,33 +74,47 @@ export function UsersData(props) {
         }
         return user;
       });
-  
+
       // Find the specific user to update
-      const userToUpdate = changeUser.find(user => user.id === updatedUser.id);
-        
+      const userToUpdate = changeUser.find(
+        (user) => user.id === updatedUser.id
+      );
+
       // Send the updated user data to the server
-      await axios.patch(`http://localhost:5000/patch/${updatedUser.id}`, userToUpdate);
-  
+      if (userToUpdate) {
+        await axios.patch(
+          `http://localhost:5000/patch/${updatedUser.id}`,
+          userToUpdate
+        );
+      }
       console.log(changeUser, "changeUser");
       return changeUser;
     } catch (err) {
       console.log("something went wrong to edit user data", err);
     }
   };
-  
 
   return (
     <>
       <div className="container container-fluid border border-2 rounded rounded-3 p-4">
         <div className="row">
           <div className="col-sm-8">
-            <UsersTable users={users} deleteUser={deleteUser} editUser={editUser} />
+            <UsersTable
+              users={users}
+              deleteUser={deleteUser}
+              editUser={editUser}
+            />
           </div>
           <div className="col-sm-4 border border-2 rounded rounded-2 p-3">
             {flag ? (
               <AddUser addNewData={addNewData} />
             ) : (
-              <EditUser userName={editingUser} setUser={setEditingUser} addUserActive={addUserActive} editUserName={editUserName}/>
+              <EditUser
+                userName={editingUser}
+                setUser={setEditingUser}
+                addUserActive={addUserActive}
+                editUserName={editUserName}
+              />
             )}
           </div>
         </div>
